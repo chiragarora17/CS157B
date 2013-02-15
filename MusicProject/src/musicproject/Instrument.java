@@ -15,6 +15,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -27,7 +30,9 @@ import org.hibernate.criterion.Order;
  * @author chirag
  */
 
+
 @Entity
+@Table(name="instrument")
 public class Instrument {
     
     private int instrumentid;
@@ -35,6 +40,9 @@ public class Instrument {
     private double cost;
     private int inStock;
     private Description description;
+    private List<Student> students;
+    private List<Accessories> accessory;
+    
     
     public Instrument(){}
     
@@ -64,13 +72,25 @@ public class Instrument {
     @JoinColumn(name="descid")
     public Description getDescId() { return description; }
     public void setDescId(Description description) { this.description = description; }
+    @OneToMany(mappedBy="instrument", targetEntity=Student.class,
+    cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    public List<Student> getStudents() { return students; }
+    public void setStudents(List<Student> students) { this.students = students; }
+    
+    @ManyToMany
+    @JoinTable(name="Instrument_Accessory", 
+               joinColumns={@JoinColumn(name="instrument_code")},
+               inverseJoinColumns={@JoinColumn(name="accessory_code")})
+    public List<Accessories> getAccessory() { return accessory; }
+    public void setAccessory(List<Accessories> accessory) { this.accessory = accessory; }
+    
     
     /**
     * Print Instrument attributes.
     */
-    private void print()
+    public void print()
     {
-        System.out.printf("%d: %s %d %d (%s) \n", instrumentid, name, cost,inStock, description.getdescId());
+        System.out.printf("%d:\t%s\t%.2f\t%d\t(%s) \n", instrumentid, name, cost,inStock, description.getdescId());
     }
     
      /**
@@ -81,9 +101,9 @@ public class Instrument {
         Session session = HibernateContext.getSession();
         Transaction tx = session.beginTransaction();
         {
-            session.save(new Instrument("Flute", 200.00,2, new Description("This is flute")));
+            session.save(new Instrument("Flute ", 200.00,2, new Description("This is flute")));
             session.save(new Instrument("Piccolo", 400.00,2, new Description("This is Piccolo")));
-            session.save(new Instrument("Clarinet", 400.00,2, new Description("This is Clarinet")));
+            session.save(new Instrument("Clarin", 400.00,2, new Description("This is Clarinet")));
             session.save(new Instrument("Basson", 500.00,2, new Description("This is Basson")));
         }
         tx.commit();
@@ -99,11 +119,11 @@ public class Instrument {
     {
         Session session = HibernateContext.getSession();
         Criteria criteria = session.createCriteria(Instrument.class);
-        criteria.addOrder(Order.asc("instrumentid"));
+     //   criteria.addOrder(Order.asc("name"));
         
         List<Instrument> instruments = criteria.list();
         System.out.println("All Instruments:");
-        
+        System.out.println("ID:\tNAME\tCOST\tSTOCK\tDESCRIPTION_ID");
         for (Instrument ins : instruments) {
             ins.print();
         }
