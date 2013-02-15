@@ -1,0 +1,59 @@
+CREATE DATABASE musicstore;
+CREATE  TABLE `musicstore`.`description` (
+  `descriptionid` INT NOT NULL AUTO_INCREMENT,
+  `description` VARCHAR(128) NULL ,
+  PRIMARY KEY (`descriptionid`) );
+
+
+CREATE  TABLE `musicstore`.`instrument` (
+  `instrumentid` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) UNIQUE NOT NULL ,
+  `cost` DECIMAL(6,2) NOT NULL ,
+  `inStock` INT NOT NULL DEFAULT 0 ,
+  `descid` INT NOT NULL,
+  INDEX `fk_instrument_1_idx` (`instrumentid` ASC) ,
+  PRIMARY KEY (`instrumentid`),
+  CONSTRAINT `fk_instrument_1`
+  FOREIGN KEY (`descid`) REFERENCES `musicstore`.`description` (`descriptionid` ) 
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+CREATE  TABLE `musicstore`.`student` (
+  `studentid` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL ,
+  `instrument_id` INT NULL,
+  INDEX `fk_student__1_idx` (`studentid` ASC) ,
+  PRIMARY KEY (`studentid`),
+  CONSTRAINT `fk_student_1`
+  FOREIGN KEY (`instrument_id`) REFERENCES `musicstore`.`instrument` (`instrumentid` ) 
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+CREATE  TABLE `musicstore`.`accessories` (
+  `accessoryid` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL ,
+  `cost` DECIMAL(6,2) NOT NULL ,
+  `inStock` INT NOT NULL DEFAULT 0 ,
+  INDEX `fk_accessory_1_idx` (`accessoryid` ASC) ,
+  PRIMARY KEY (`accessoryid`));
+
+
+  CONSTRAINT `fk_accessory_1`
+  FOREIGN KEY (`descid`) REFERENCES `musicstore`.`description` (`descriptionid` ) 
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+CREATE  TABLE `musicstore`.`instrument_accessory` (
+  `instrument_id` INT NULL,
+  `accessory_id` INT NULL,
+  INDEX `fk_join_1_idx` (`instrument_id` ASC) ,
+  CONSTRAINT `fk_join_instrument_1`
+  FOREIGN KEY (`instrument_id`) REFERENCES `musicstore`.`instrument` (`instrumentid` ) 
+    ON DELETE CASCADE
+    ON UPDATE CASCADE, 
+  CONSTRAINT `fk_join_accessory_1`
+  FOREIGN KEY (`accessory_id`) REFERENCES `musicstore`.`accessories` (`accessoryid` ) 
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);

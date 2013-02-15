@@ -1,0 +1,5 @@
+DROP TABLE `musicstore`.`instrument_accessory`;
+DROP TABLE `musicstore`.`accessories`;
+DROP TABLE `musicstore`.`student`;
+DROP TABLE `musicstore`.`instrument`;
+DROP TABLE `musicstore`.`description`;
