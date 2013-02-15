@@ -35,7 +35,7 @@ public class Description {
     @Id
     @GeneratedValue
     @Column(name="descriptionid")
-    public long getdescId() { return descriptionid; }
+    public int getdescId() { return descriptionid; }
     public void setdescId(int descriptionid) { this.descriptionid = descriptionid; }
 
     @Column(name="description")
