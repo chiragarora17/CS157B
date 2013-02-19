@@ -19,6 +19,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
@@ -90,7 +91,7 @@ public class Instrument {
     */
     public void print()
     {
-        System.out.printf("%d:\t%s\t%.2f\t%d\t(%s) \n", instrumentid, name, cost,inStock, description.getdescId());
+        System.out.printf("%d:\t%s\t%.2f\t%d\t(%s) \n", instrumentid, name, cost,inStock, description.getdescription());
     }
     
      /**
@@ -100,11 +101,20 @@ public class Instrument {
     {
         Session session = HibernateContext.getSession();
         Transaction tx = session.beginTransaction();
+        Instrument i1=new Instrument("Clarinet", 400.00,2, new Description("This is Clarinet"));
+        Instrument i2=new Instrument("Basson", 500.00,2, new Description("This is Basson"));
+        Instrument i3=new Instrument("Flute ", 200.00,2, new Description("This is flute"));
+        Instrument i4 = new Instrument("Piccolo", 400.00,2, new Description("This is Piccolo"));
+        
+        Accessories reed = Accessories.find(1);
+        System.out.println(Accessories.find(1));
+        i1.getAccessory().add(reed);
+        i2.getAccessory().add(reed); 
         {
-            session.save(new Instrument("Flute ", 200.00,2, new Description("This is flute")));
-            session.save(new Instrument("Piccolo", 400.00,2, new Description("This is Piccolo")));
-            session.save(new Instrument("Clarin", 400.00,2, new Description("This is Clarinet")));
-            session.save(new Instrument("Basson", 500.00,2, new Description("This is Basson")));
+            session.save(i1);
+            session.save(i2);
+            session.save(i3);
+            session.save(i4);
         }
         tx.commit();
         session.close();
@@ -135,21 +145,33 @@ public class Instrument {
      * @param name the name to match.
      * @return the instrument or null.
      */
-    public static Instrument find(String Name)
+    public static Instrument find(String name)
     {
         // Query by example.
         Instrument prototype = new Instrument();
-        prototype.setName(Name);
-        Example example = Example.create(prototype);  
+        prototype.setName(name);
+        Example example = Example.create(prototype);
         
         Session session = HibernateContext.getSession();
         Criteria criteria = session.createCriteria(Instrument.class);
         criteria.add(example);
-
-        Instrument ins = (Instrument) criteria.uniqueResult();
+        
+        Instrument instrument = (Instrument) criteria.uniqueResult();
         
         session.close();
-        return ins;
+        return instrument;
     }
     
+     public static Instrument find(int id)
+    {
+        // Query using HQL.
+        Session session = HibernateContext.getSession();
+        Query query = session.createQuery("from Instrument where id = :idvar");
+        
+        query.setInteger("idvar", id);
+        Instrument instrument = (Instrument) query.uniqueResult();
+        
+        session.close();
+        return instrument;
+    }
 }

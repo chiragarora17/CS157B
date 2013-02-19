@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 public class MusicProject 
 {
     private static final String HELP_MESSAGE =
-        "*** Commands: create, load, find <n>, add, delete, teachers, quit\n" +
+        "*** Commands: create, load, find <n>, instruments, students, accessory, quit\n" +
         "***           students [ <first> <last> ], classes [ <first> <last> ]";
     
     public static void main(String args[]) 
@@ -40,25 +40,28 @@ public class MusicProject
                 Student.load();
                 Instrument.load();
                 Accessories.load();
+              
             }
-            else if (command.equalsIgnoreCase("add")) {
-                //Student.add();
-            }
-            else if (command.equalsIgnoreCase("delete")) {
-               // Student.delete();
-            }
-            else if (command.equalsIgnoreCase("list")) {
+            else if (command.equalsIgnoreCase("accessory")) {
                 Accessories.list();
             }
-/*            else if (parts[0].equalsIgnoreCase("find") &&
-                    (parts.length >= 2)) {
-                long id = Long.parseLong(parts[1]);
-                Student student = Student.find(id);
+            else if (command.equalsIgnoreCase("instruments")) {
+                Instrument.list();
+            }
+           else if (command.equalsIgnoreCase("students")) {
+                Student.list();
+            }
+                        
+            else if (parts[0].equalsIgnoreCase("check"))
+            {
+                 Student.instrumentplayed(parts[1]);
+                }
                 
+            
                 // Because the Student object is fetched from the database,
                 // we can access its fields only within a session. 
                 // Otherwise, we'll get a LazyInitializationException.
-                if (student != null) {
+           /*     if (student != null) {
                     student.printInSession();
                 }
                 else {

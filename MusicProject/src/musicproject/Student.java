@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.ManyToMany;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
@@ -47,7 +48,7 @@ public class Student {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     @ManyToOne
-    @JoinColumn(name="instrument_id")
+    @JoinColumn(name="instrumentid")
     public Instrument getInstrument() { return instrument_id; }
     public void setInstrument(Instrument instrument_id) { this.instrument_id = instrument_id; }
  
@@ -67,11 +68,11 @@ public class Student {
     {
         Session session = HibernateContext.getSession();
         
-        Instrument flute = Instrument.find("Flute");
-        Instrument piccolo = Instrument.find("Piccolo");
-        Instrument clarinet = Instrument.find("Clarinet");
-        Instrument basson = Instrument.find("Basson");
-        
+        Instrument flute = Instrument.find(1);
+        Instrument piccolo = Instrument.find(2);
+        Instrument clarinet = Instrument.find(3);
+        Instrument basson = Instrument.find(4);
+        System.out.println(flute);
         Student s1 = new Student("Ron Mak");
         s1.setInstrument(flute);
         Student s2 = new Student("Charles Flood");
@@ -91,6 +92,7 @@ public class Student {
             session.save(s4);
             session.save(s5);
         }
+       
         tx.commit();
         session.close();
         
@@ -117,55 +119,51 @@ public class Student {
     }
     
     /**
-     * Fetch the student with a matching name.
-     * @param name the name to match.
+     * Fetch the student with a matching id.
+     * @param id the id to match.
      * @return the student or null.
      */
-    public static Student find(String name)
+    public static Student find(int id)
     {
-        // Query by example.
-        Student prototype = new Student();
-        prototype.setName(name);
-        Example example = Example.create(prototype);
-        
+        // Query using HQL.
         Session session = HibernateContext.getSession();
-        Criteria criteria = session.createCriteria(Student.class);
-        criteria.add(example);
+        Query query = session.createQuery("from Student where id = :idvar");
         
-        Student stu = (Student) criteria.uniqueResult();
+        query.setInteger("idvar", id);
+        Student student = (Student) query.uniqueResult();
         
         session.close();
-        return stu;
+        return student;
     }
+
     
     /**
      * Print a professor's classes.
      * @param first the professor's first name.
      * @param last the professor's last name.
      */
-  /*  public static void classesOf(String first, String last)
+    public static void instrumentplayed(String name)
     {
         Session session = HibernateContext.getSession();
-        Criteria classCriteria = session.createCriteria(Student.class);
-        Criteria teacherCriteria = classCriteria.createCriteria("teacher");
+        Criteria studentCriteria = session.createCriteria(Student.class);
+        Criteria instrumentCriteria = studentCriteria.createCriteria("instrument");
 
         // Match the first and last names.
-        teacherCriteria.add(Restrictions.eq("firstName", first))
-                       .add(Restrictions.eq("lastName", last));
+        instrumentCriteria.add(Restrictions.eq("name", name));
 
         // Distinct classes sorted by subject.
-        classCriteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        classCriteria.addOrder(Order.asc("subject"));
-        List<Klass> klasses = (List<Klass>) classCriteria.list();
+        studentCriteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        //studentCriteria.addOrder(Order.asc("name"));
+        List<Student> klasses = (List<Student>) studentCriteria.list();
         
-        System.out.printf("Classes taught by %s %s:\n", first, last);
-        for (Klass klass : klasses) {
-            System.out.printf("    %s\n", klass.getSubject());
+        System.out.printf("Instruments %s played by :\n", name);
+        for (Student klass : klasses) {
+            System.out.printf("    %s\n", klass.getName());
         }
         
         session.close();
     }
-    */
+    
 
 }
 

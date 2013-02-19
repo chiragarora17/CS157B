@@ -15,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
@@ -100,6 +101,7 @@ public class Accessories {
         Session session = HibernateContext.getSession();
         session.update(this);
         print();
+        
         session.close();
     }
     /**
@@ -124,18 +126,45 @@ public class Accessories {
         return acc;
     }
     
+        public static Accessories find(int id)
+    {
+        // Query using HQL.
+        Session session = HibernateContext.getSession();
+        Query query = session.createQuery("from Accessories where id = :idvar");
+        
+        query.setInteger("idvar", id);
+        Accessories accessories = (Accessories) query.uniqueResult();
+        
+        session.close();
+        return accessories;
+    }
+
      /**
      * Load the Accessories table.
      */
     public static void load()
     {
         Session session = HibernateContext.getSession();
+        Accessories a1=new Accessories("Reed", 20.00,2);
+       Accessories a2=new Accessories("Cleaningkit", 20.00,2);
+        
+        List<Instrument> ins = new ArrayList<Instrument>();    
+        Instrument flute = Instrument.find("Flute");
+        Instrument piccolo = Instrument.find("Piccolo");
+        Instrument clarinet = Instrument.find("Clarinet");
+        Instrument basson = Instrument.find("Basson");
+        System.out.println(basson);
+        
+        
+        ins.add(clarinet);
+        ins.add(basson);
+        a1.getInstrument().add(clarinet);
+        a1.getInstrument().add(basson);
+        
         Transaction tx = session.beginTransaction();
         {
-            session.save(new Accessories("Flute accessory", 20.00,2));
-            session.save(new Accessories("Piccolo accessory", 40.00,2));
-            session.save(new Accessories("Clarinet accessory", 40.00,2));
-            session.save(new Accessories("Basson accessory", 50.00,2));
+            session.save(a1);
+            session.save(a2);
         }
         tx.commit();
         session.close();
